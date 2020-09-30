@@ -1,0 +1,26 @@
+{
+  "name": "multiflood",
+  "version": "1.0.0",
+  "description": "Flood-fill game for multiple players and AIs",
+  "main": "index.js",
+  "dependencies": {
+    "http-server": "^0.12.3",
+    "phaser": "^3.24.1"
+  },
+  "devDependencies": {
+    "webpack": "^4.44.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devanshk/MultiFlood.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/devanshk/MultiFlood/issues"
+  },
+  "homepage": "https://github.com/devanshk/MultiFlood#readme"
+}
