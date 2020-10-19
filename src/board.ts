@@ -22,6 +22,7 @@ export class Board {
 // TODO: Class to handle rendering the game board
 export class BoardScene extends Phaser.Scene {
     board: Board;
+    grid: Phaser.GameObjects.Grid;
 
     constructor(board: Board) {
         super({
@@ -29,15 +30,28 @@ export class BoardScene extends Phaser.Scene {
         });
         this.board = board;
     }
+
     init(params): void {
-        // TODO
     }
+
     preload(): void {
         // TODO
     }
       
     create(): void {
-        // TODO
+        this.add.grid(
+            undefined, 
+            undefined, 
+            undefined, 
+            undefined, 
+            128.0 / this.board.dimension, 
+            128.0/this.board.dimension, 
+            0xff0000, 
+            undefined, 
+            undefined, 
+            undefined
+        );
+        this.scene.start("BoardScene");
     }
 
     update(time): void {

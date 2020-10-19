@@ -4,6 +4,7 @@ const config: GameConfig = {
   title: "Multiflood",
   width: 800,
   height: 600,
+  scene: [BoardScene],
   parent: "game",
   backgroundColor: "#18216D"
 };
