@@ -7,3 +7,6 @@ Flood-fill game for multiple players and AIs
 3. Apply RL AIs to game
 4. Add multiplayer capability
 5. Train RL AIs against each other
+
+## Where We Are At Right Now
+![Our Current Status](https://github.com/devanshk/Multiflood/blob/master/screenshots/CurrentStatus.png?raw=true)
