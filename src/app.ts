@@ -4,9 +4,15 @@ const config: GameConfig = {
   title: "Multiflood",
   width: 800,
   height: 600,
-  scene: [BoardScene],
   parent: "game",
-  backgroundColor: "#18216D"
+  scene: [BoardScene],
+  physics: {
+    default: "arcade",
+    arcade: {
+      debug: false
+    }
+  },
+  backgroundColor: "#000033"
 };
 export class MultifloodGame extends Phaser.Game {
   constructor(config: GameConfig) {
