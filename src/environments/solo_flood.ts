@@ -75,9 +75,9 @@ export class SoloFlood implements Environment<TState, TAction>{
     if (row < 0 || row >= this.state.length) { return 0; }
     if (col < 0 || col >= this.state[0].length) { return 0; }
     if (seen[row][col]) { return 0; }
-    seen[row][col] = true;
     if (this.state[row][col].color !== color) { return 0; }
 
+    seen[row][col] = true;
     let reward = 0;
     if (this.state[row][col].color == color) {
       let was_unowned = !this.state[row][col].owned;
