@@ -65,7 +65,7 @@ export class SoloFloodScene extends Phaser.Scene {
     this.score_text =
       this.add.text(
         10, this.cameras.main.height-180, '',
-        {fontSize: 200, color:'rgba(255,255,255,0.2)', fontFamily: 'Courier New'}
+        {fontSize: 200, color:'rgba(255,255,255,0.1)', fontFamily: 'Courier New'}
       );
 
     this.render();
