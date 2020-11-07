@@ -6,7 +6,7 @@ import { Square } from './square';
 //
 
 // Board of size dimension * dimension
-// Stored as [[row 1][row 2]..]
+// Stored as [[row 0][row 1]..]
 type TState = Array<Array<Square>>;
 
 // An action is just a number (color) to change your owned squares to
