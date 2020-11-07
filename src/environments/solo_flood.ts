@@ -53,7 +53,7 @@ export class SoloFlood implements Environment<TState, TAction>{
       (square: Square) => square.owned ? square.color = action : {}
     );
 
-    // Create an all-false bool mask then flood-claim from (0,0)
+    // Create an all-false visited array then flood-claim from (0,0)
     let false_board = this.state.map((row) => row.map(() => false));
     let reward = this.floodFill(0, 0, action, false_board);
 
