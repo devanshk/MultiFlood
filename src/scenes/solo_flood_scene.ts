@@ -1,5 +1,5 @@
 import 'phaser';
-import { SoloFlood, Square } from '../core/soloflood';
+import { SoloFlood, Square } from '../core/solo_flood';
 
 //
 // Renders an interactive SoloFlood game
