@@ -1,11 +1,13 @@
 import "phaser";
 import { BoardScene } from "./board";
+import { SoloFloodScene } from './scenes/solo_flood_scene';
+
 const config: GameConfig = {
   title: "Multiflood",
   width: 800,
   height: 600,
   parent: "game",
-  scene: [BoardScene],
+  scene: [SoloFloodScene],
   physics: {
     default: "arcade",
     arcade: {

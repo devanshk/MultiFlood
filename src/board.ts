@@ -15,8 +15,8 @@ export class Block{
     }
 
     claim(
-        claiming_player: integer, 
-        claiming_color: number, 
+        claiming_player: integer,
+        claiming_color: number,
         claiming_color_index: integer
     ): boolean {
         if (this.owning_player > 0) {
@@ -36,7 +36,7 @@ export class Board {
     colors: Array<number>;
 
     constructor(
-        dimension: integer, 
+        dimension: integer,
         colors: Array<number>,
     ) {
         this.dimension = dimension;
@@ -89,7 +89,7 @@ export class BoardScene extends Phaser.Scene {
     preload(): void {
         // TODO
     }
-      
+
     create(): void {
         let position_x = 300;
         let position_y = 200;
@@ -99,15 +99,15 @@ export class BoardScene extends Phaser.Scene {
             for (let j = 0 ; j < this.board.get_dimension(); j++) {
                 let block = this.board.get_block(i, j);
                 block_objects[i][j] = this.add.rectangle(
-                    position_x + i*50, 
+                    position_x + i*50,
                     position_y + j*50,
                     40,
                     40,
                     block.color
                 );
 
-            } 
-        } 
+            }
+        }
     }
 
     update(time): void {
