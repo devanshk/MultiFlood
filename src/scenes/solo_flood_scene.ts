@@ -45,6 +45,7 @@ export class SoloFloodScene extends Phaser.Scene {
               40,
             ).setInteractive().on('pointerdown', () => {
               let { reward } = this.env.step(square.color);
+              this.cumulative_reward += reward;
               console.log(reward);
               this.render();
             })
