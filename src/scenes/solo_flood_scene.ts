@@ -9,7 +9,11 @@ export class SoloFloodScene extends Phaser.Scene {
   env: SoloFlood;
   colors: Array<Phaser.Display.Color>;
   board_grid: Array<Array<Phaser.GameObjects.Rectangle>>;
-  cumulative_reward: number;
+  metrics: {
+    steps: number;
+    cumulative_reward: number;
+  }
+  score_text: Phaser.GameObjects.Text;
 
   init(params: any): void {
     const dimension = params.dimension ?? 7;
@@ -18,7 +22,10 @@ export class SoloFloodScene extends Phaser.Scene {
     this.colors = Array(num_colors).fill(0).map(
       () => new Phaser.Display.Color().random()
     );
-    this.cumulative_reward = 0;
+    this.metrics = {
+      steps: 0,
+      cumulative_reward: 0,
+    };
   }
 
   create(): void {
@@ -45,12 +52,21 @@ export class SoloFloodScene extends Phaser.Scene {
               40,
             ).setInteractive().on('pointerdown', () => {
               let { reward } = this.env.step(square.color);
-              this.cumulative_reward += reward;
-              console.log(reward);
+              this.metrics = {
+                ...this.metrics,
+                steps: this.metrics.steps + 1,
+                cumulative_reward: this.metrics.cumulative_reward + reward
+              }
               this.render();
             })
         )
     );
+
+    this.score_text =
+      this.add.text(
+        10, this.cameras.main.height-180, '',
+        {fontSize: 200, color:'rgba(255,255,255,0.2)', fontFamily: 'Courier New'}
+      );
 
     this.render();
   }
@@ -65,6 +81,8 @@ export class SoloFloodScene extends Phaser.Scene {
               .setStrokeStyle(5, 0xffffff, state[i][j].owned ? 1 : 0)
         )
     );
+
+    this.score_text.setText('' + this.metrics.steps);
   }
 
   private getTopLeftPos(
