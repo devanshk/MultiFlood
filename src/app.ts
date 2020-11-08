@@ -1,5 +1,6 @@
 import "phaser";
 import { SoloFloodScene } from './scenes/solo_flood_scene';
+import { MultiFloodScene } from './scenes/multi_flood_scene';
 
 const screenWidth = window.innerWidth;
 const screenHeight = window.innerHeight;
@@ -9,7 +10,7 @@ const config: GameConfig = {
   width: screenWidth - 16,
   height: screenHeight - 16,
   parent: "game",
-  scene: [SoloFloodScene],
+  scene: [MultiFloodScene],
   physics: {
     default: "arcade",
     arcade: {

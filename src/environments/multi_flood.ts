@@ -6,12 +6,12 @@ import { Board } from './board'
 // Multiplayer Flood Environment
 //
 
-type TState = Board;
+export type TState = Board;
 
 // An action is just a number (color) to change your owned squares to
 export type TAction = number
 
-export class SoloFlood implements Environment<TState, TAction>{
+export class MultiFlood implements Environment<TState, TAction>{
   private state: TState;
 
   SQUARE_CLAIM_REWARD = 1;

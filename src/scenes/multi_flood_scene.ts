@@ -1,12 +1,12 @@
 import 'phaser';
-import { SoloFlood, Square } from '../environments/solo_flood';
+import { MultiFlood, Block } from '../environments/multi_flood';
 
 //
-// Renders an interactive SoloFlood game
+// Renders an interactive MultiFlood game
 //
 
-export class SoloFloodScene extends Phaser.Scene {
-  env: SoloFlood;
+export class MultiFloodScene extends Phaser.Scene {
+  env: MultiFlood;
   colors: Array<Phaser.Display.Color>;
   board_grid: Array<Array<Phaser.GameObjects.Rectangle>>;
   metrics: {
@@ -18,7 +18,7 @@ export class SoloFloodScene extends Phaser.Scene {
   init(params: any): void {
     const dimension = params.dimension ?? 7;
     const num_colors = params.num_colors ?? 4;
-    this.env = new SoloFlood(dimension, num_colors);
+    this.env = new MultiFlood(dimension, num_colors);
     this.colors = Array(num_colors).fill(0).map(
       () => new Phaser.Display.Color().random()
     );
@@ -35,16 +35,16 @@ export class SoloFloodScene extends Phaser.Scene {
       this.getTopLeftPos(
         this.getCenter(),
         {
-          width: state[0].length * 50,
-          height: state.length * 50
+          width: state.board[0].length * 50,
+          height: state.board.length * 50
         }
       );
 
     // Convert the game board into a grid of Phaser rectangles
-    this.board_grid = state.map(
-      (row: Array<Square>, i: number) =>
+    this.board_grid = state.board.map(
+      (row: Array<Block>, i: number) =>
         row.map(
-          (square: Square, j: number) =>
+          (square: Block, j: number) =>
             this.add.rectangle(
               pos_x + i * 50 + 25,
               pos_y + j * 50 + 25,
@@ -78,8 +78,8 @@ export class SoloFloodScene extends Phaser.Scene {
       (row: Array<Phaser.GameObjects.Rectangle>, i: number) =>
         row.forEach(
           (rect: Phaser.GameObjects.Rectangle, j: number) => {
-            rect.setFillStyle(this.colors[state[i][j].color].color)
-              .setStrokeStyle(5, 0xffffff, state[i][j].owned ? 1: 0)
+            rect.setFillStyle(this.colors[state.board[i][j].color].color)
+              .setStrokeStyle(5, 0xffffff, state.board[i][j].owning_player >= 0 ? 1: 0)
           }
         )
     );

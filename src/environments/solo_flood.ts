@@ -5,12 +5,12 @@ import { Environment } from './environment';
 
 // Board of size dimension * dimension
 // Stored as [[row 0][row 1]..]
-type TState = Array<Array<Square>>;
+export type TState = Array<Array<Square>>;
 
 // An action is just a number (color) to change your owned squares to
-type TAction = number
+export type TAction = number
 
-export class MultiFlood implements Environment<TState, TAction>{
+export class SoloFlood implements Environment<TState, TAction>{
   private state: TState;
 
   SQUARE_CLAIM_REWARD = 1;
