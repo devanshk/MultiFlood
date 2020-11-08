@@ -1,5 +1,6 @@
 import { RLAgent } from './rl_agent';
 import * as tf from '@tensorflow/tfjs';
+import { Memory } from '../data_structures/memory';
 
 type TParams = {
   state_space: number,
@@ -7,6 +8,7 @@ type TParams = {
   name?: string,
   epsilon?: number,
   gamma?: number,
+  memory_size?: number,
   batch_size?: number,
   epsilon_min?: number,
   epsilon_decay?: number,
@@ -18,16 +20,18 @@ type TParams = {
 // TODO: make this a generic that gets passed in
 type TAction = number;
 
-export class DQNAgent<TState> implements RLAgent<TState, TAction>{
+type TMem<TState> = {
+  state: TState,
+  action: TAction,
+  reward: number,
+  next_state: TState,
+  done: boolean
+};
+
+export class DQNAgent<TState extends tf.Tensor> implements RLAgent<TState, TAction>{
   params: TParams;
   model: tf.Sequential;
-  memory: Array<{
-    state: TState,
-    action: TAction,
-    reward: number,
-    next_state: TState,
-    done: boolean
-  }>
+  memory: Memory<TMem<TState>>
 
   constructor(
     params: TParams
@@ -36,6 +40,7 @@ export class DQNAgent<TState> implements RLAgent<TState, TAction>{
       name: 'GenericDQN',
       epsilon: 1,
       gamma: .95,
+      memory_size: 50000,
       batch_size: 500,
       epsilon_min: .01,
       epsilon_decay: .995,
@@ -43,7 +48,7 @@ export class DQNAgent<TState> implements RLAgent<TState, TAction>{
       layer_sizes: [128, 128, 128],
       ...params
     }
-    this.memory = [];
+    this.memory = new Memory(this.params.memory_size);
     this.model = this.build_model();
   }
 
@@ -51,11 +56,14 @@ export class DQNAgent<TState> implements RLAgent<TState, TAction>{
     if (Math.random() <= this.params.epsilon) {
       return Math.floor(Math.random() * this.params.action_space);
     }
-    let action_values = this.model.predict(state);
-    return tf.argMax(action_values[0]);
+    // Need to tidy for garbage collection in tensorflowjs
+    return tf.tidy(() => {
+      let prediction = this.model.predict(state) as tf.Tensor<tf.Rank>;
+      return tf.argMax(prediction, 1).dataSync()[0];
+    });
   }
 
-  remember(state: any, action: any, reward: number, next_state: any, done: boolean): void {
+  remember(state: TState, action: TAction, reward: number, next_state: TState, done: boolean): void {
     this.memory.push(
       { state, action, reward, next_state, done }
     );
@@ -64,31 +72,46 @@ export class DQNAgent<TState> implements RLAgent<TState, TAction>{
   replay(): void {
     if (this.memory.length < this.params.batch_size) { return; }
 
-    let minibatch = tf.randomUniform(this.memory);
+    let minibatch = this.memory.sample(this.params.batch_size);
+    let states = tf.tensor(minibatch.map((x: TMem<TState>) => x.state.dataSync()[0]));
+    let actions = minibatch.map((x: TMem<TState>) => x.action);
+    let rewards = minibatch.map((x: TMem<TState>) => x.reward);
+    let next_states = tf.tensor(minibatch.map((x: TMem<TState>) => x.next_state.dataSync()[0]));
+    let dones = minibatch.map((x: TMem<TState>) => x.done);
+
+    let predictions = this.model.predictOnBatch(next_states);
+    // TODO: clean up this monster formula
+    let targets = rewards.map((reward: number, i: number) => reward + this.params.gamma + tf.argMax(predictions[i]).dataSync()[1] * (1 - (dones[i] ? 0 : 1)));
+    let targets_full = this.model.predictOnBatch(states);
+
+    let indices = tf.tensor([...Array(this.params.batch_size).keys()])
+
+    // TODO: finish updating targets_full before passing it as labels to the
+    // model
+
+    this.model.fit(states, targets_full, { epochs: 1, verbose: 0 });
+    if (this.params.epsilon > this.params.epsilon_min) {
+      this.params.epsilon *= this.params.epsilon_decay;
+    }
   }
 
   private build_model() {
     let model = tf.sequential();
     this.params.layer_sizes.forEach((size, i: number) =>
-      i === 0 ?
-        model.add(tf.layers.dense({
-          units: size,
-          inputDim: this.params.state_space,
-          activation: 'relu'
-        })) :
-        model.add(tf.layers.dense({
-          units: size,
-          activation: 'relu'
-        }))
-    )
+      model.add(tf.layers.dense({
+        units: size,
+        activation: 'relu',
+        inputDim: i == 0 ? this.params.state_space : undefined,
+      }))
+    );
     model.add(tf.layers.dense({
       units: this.params.action_space,
       activation: 'softmax'
-    }))
+    }));
 
     model.compile({
       optimizer: tf.train.adam(this.params.learning_rate),
-      loss: 'mse'
+      loss: 'meanSquaredError'
     });
 
     return model;

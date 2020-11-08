@@ -1,4 +1,7 @@
 import { Environment } from './environment';
+import { TensorflowEnvTrait } from './tensorflow_env_trait';
+import * as tf from '@tensorflow/tfjs';
+import { flatten } from 'lodash';
 //
 // One-player Flood Environment
 //
@@ -7,10 +10,13 @@ import { Environment } from './environment';
 // Stored as [[row 0][row 1]..]
 export type TState = Array<Array<Square>>;
 
+// Tensorflow state type
+export type TTFState = tf.Tensor1D;
+
 // An action is just a number (color) to change your owned squares to
 export type TAction = number
 
-export class SoloFlood implements Environment<TState, TAction>{
+export class SoloFlood implements Environment<TState, TAction> {
   private state: TState;
 
   SQUARE_CLAIM_REWARD = 1;
@@ -21,6 +27,12 @@ export class SoloFlood implements Environment<TState, TAction>{
     private num_colors: number,
   ) {
     this.reset();
+  }
+
+  // TODO: Replace this with StateAdapters
+  // Currently only exports colors, TODO: add ownership info
+  stateToTensor(state: TState): TTFState {
+    return tf.tensor(flatten(state).map((x: Square) => x.color));
   }
 
   get_state() {
