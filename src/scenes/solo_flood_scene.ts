@@ -1,5 +1,5 @@
 import 'phaser';
-import { SoloFlood, Square } from '../environments/solo_flood';
+import { SoloFlood, Block } from '../environments/solo_flood';
 
 //
 // Renders an interactive SoloFlood game
@@ -18,6 +18,7 @@ export class SoloFloodScene extends Phaser.Scene {
     this.colors = Array(num_colors).fill(0).map(
       () => new Phaser.Display.Color().random()
     );
+    console.log(this.colors);
   }
 
   create(): void {
@@ -26,10 +27,10 @@ export class SoloFloodScene extends Phaser.Scene {
 
     // Convert the game board into a grid of Phaser rectangles
     const state = this.env.get_state();
-    this.board_grid = state.map(
-      (row: Array<Square>, i: number) =>
+    this.board_grid = state.board.map(
+      (row: Array<Block>, i: number) =>
         row.map(
-          (square: Square, j: number) =>
+          (square: Block, j: number) =>
             this.add.rectangle(
               pos_x + i * 50,
               pos_y + j * 50,
@@ -48,12 +49,14 @@ export class SoloFloodScene extends Phaser.Scene {
 
   private render(): void {
     const state = this.env.get_state();
+    console.log(state);
     this.board_grid.forEach(
       (row: Array<Phaser.GameObjects.Rectangle>, i: number) =>
         row.forEach(
-          (rect: Phaser.GameObjects.Rectangle, j: number) =>
-            rect.setFillStyle(this.colors[state[i][j].color].color)
-              .setStrokeStyle(5, 0xffffff, state[i][j].owned ? 1 : 0)
+          (rect: Phaser.GameObjects.Rectangle, j: number) => {
+            rect.setFillStyle(this.colors[state.board[i][j].color].color)
+              .setStrokeStyle(5, 0xffffff, state.board[i][j].owning_player >= 0 ? 1: 0)
+          }
         )
     );
   }

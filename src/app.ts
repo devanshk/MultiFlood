@@ -1,5 +1,4 @@
 import "phaser";
-import { BoardScene } from "./board";
 import { SoloFloodScene } from './scenes/solo_flood_scene';
 
 const config: GameConfig = {
