@@ -1,7 +1,7 @@
 const path = require('path');
 
 module.exports = {
-  entry: './src/training-app.ts',
+  entry: './src/app.ts',
   module: {
     rules: [
       {
