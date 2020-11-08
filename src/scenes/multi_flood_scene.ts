@@ -2,7 +2,7 @@ import 'phaser';
 import { MultiFlood, Block } from '../environments/multi_flood';
 
 //
-// Renders an interactive MultiFlood game
+// Renders an interactive MultiFlood game (wip)
 //
 
 export class MultiFloodScene extends Phaser.Scene {
