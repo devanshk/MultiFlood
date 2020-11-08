@@ -4,6 +4,7 @@
   "description": "Flood-fill game for multiple players and AIs",
   "main": "index.js",
   "dependencies": {
+    "@tensorflow/tfjs": "^2.7.0",
     "http-server": "^0.12.3"
   },
   "devDependencies": {
