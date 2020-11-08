@@ -1,18 +1,17 @@
 import { Environment } from './environment';
-import { Square } from './square';
+import { Block } from './square';
+import { Board } from './board'
 
 //
-// One-player Flood Environment
+// Multiplayer Flood Environment
 //
 
-// Board of size dimension * dimension
-// Stored as [[row 0][row 1]..]
-type TState = Array<Array<Square>>;
+type TState = Board;
 
 // An action is just a number (color) to change your owned squares to
-type TAction = number
+export type TAction = number
 
-export class MultiFlood implements Environment<TState, TAction>{
+export class SoloFlood implements Environment<TState, TAction>{
   private state: TState;
 
   SQUARE_CLAIM_REWARD = 1;
@@ -38,50 +37,48 @@ export class MultiFlood implements Environment<TState, TAction>{
   }
 
   reset() {
-    this.state = Array(this.dimension).fill(0).map(
-      () => Array(this.dimension).fill(0).map(
-        () => new Square(Math.floor(Math.random() * this.num_colors))
-      )
-    )
-    this.state[0][0].owned = true;
-    return JSON.parse(JSON.stringify(this.state));
+    this.state = new Board(
+      this.dimension,
+      this.num_colors,
+      1
+    );
+    this.state.claim_block(0, 0, 0, -1);
+    return JSON.parse(JSON.stringify(this.state.board));
   }
 
   step(action: TAction): { state: TState, reward: number, done: boolean } {
     // Set all owned squares to the given color
-    [].concat.apply([], this.state).forEach(
-      (square: Square) => square.owned ? square.color = action : {}
-    );
+    this.state.set_board(0, action)
 
     // Create an all-false visited array then flood-claim from (0,0)
-    let false_board = this.state.map((row) => row.map(() => false));
+    let false_board = this.state.board.map((row) => row.map(() => false));
     let reward = this.floodFill(0, 0, action, false_board);
 
     // The game is over if all squares are owned
-    const done = [].concat.apply([], this.state)
-      .find((square: Square) => !square.owned) === undefined;
+    const done = [].concat.apply([], this.state.board)
+      .find((square: Block) => square.owning_player >= 0) === undefined;
 
     // and we get a bonus reward for finishing the game
     reward += done ? this.GAME_FINISH_REWARD : 0;
 
     return {
-      state: JSON.parse(JSON.stringify(this.state)),
+      state: JSON.parse(JSON.stringify(this.state.board)),
       reward: reward,
       done: done,
     }
   }
 
   private floodFill(row: number, col: number, color: number, seen: Array<Array<boolean>>): number {
-    if (row < 0 || row >= this.state.length) { return 0; }
-    if (col < 0 || col >= this.state[0].length) { return 0; }
+    if (row < 0 || row >= this.state.board.length) { return 0; }
+    if (col < 0 || col >= this.state.board[0].length) { return 0; }
     if (seen[row][col]) { return 0; }
-    seen[row][col] = true;
-    if (this.state[row][col].color !== color) { return 0; }
+    if (this.state.get_block(row, col).color !== color) { return 0; }
 
+    seen[row][col] = true;
     let reward = 0;
-    if (this.state[row][col].color == color) {
-      let was_unowned = !this.state[row][col].owned;
-      this.state[row][col].owned = true;
+    if (this.state.board[row][col].color == color) {
+      let was_unowned = !(this.state.get_block(row, col).owning_player >= 0);
+      this.state.claim_block(row, col, 0, color);
       reward = was_unowned ? this.SQUARE_CLAIM_REWARD : 0;
     }
 
@@ -94,4 +91,5 @@ export class MultiFlood implements Environment<TState, TAction>{
   }
 }
 
-export { Square } from './square';
+export { Block } from './square';
+export { Board } from './board';
