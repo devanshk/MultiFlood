@@ -1,11 +1,13 @@
 import "phaser";
-import { BoardScene } from "./board";
 import { SoloFloodScene } from './scenes/solo_flood_scene';
+
+const screenWidth = window.innerWidth;
+const screenHeight = window.innerHeight;
 
 const config: GameConfig = {
   title: "Multiflood",
-  width: 800,
-  height: 600,
+  width: screenWidth - 16,
+  height: screenHeight - 16,
   parent: "game",
   scene: [SoloFloodScene],
   physics: {
