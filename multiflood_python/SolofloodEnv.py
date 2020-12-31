@@ -18,35 +18,51 @@ from tf_agents.trajectories import time_step as ts
 
 tf.compat.v1.enable_v2_behavior()
 
-SolofloodState = namedtuple(
-    "SoloFloodState",
-    [
-        "num_colors",
-        "height",
-        "width",
-        "owned_blocks",
-        "current_color",
-        "num_turns"
-    ]
-)
+class SoloFloodState(object):
+  def __init__(
+    self, 
+    num_colors=4,
+    height=10, 
+    width=10, 
+    owned_blocks=0, 
+    current_color=10, 
+    num_turns=10,
+  ):
+    self.num_colors = num_colors
+    self.height = height
+    self.width = width
+    self.owned_blocks = owned_blocks
+    self.current_color = current_color
+    self.num_turns = num_turns
+
+  @property
+  def state_array(self):
+    # Turns the state into an array (Usage: state.state_array)
+    return np.array(
+      [self.num_colors, self.height, self.width, self.owned_blocks, self.current_color, self.num_turns],
+      dtype=np.int32
+    )
 
 class SolofloodEnv(py_environment.PyEnvironment):
   
-  def __init__(self, num_colors, width, height):
+  def __init__(self, num_colors=4, width=5, height=5):
     self._action_spec = array_spec.BoundedArraySpec(
         shape=(), dtype=np.int32, minimum=0, maximum=3, name='action')
-    # Single integer representing reward
     self._observation_spec = array_spec.BoundedArraySpec(
-        shape=(1,), dtype=np.int32, minimum=0, name='observation')
-    self._state = SolofloodState(
-        4,
-        10,
-        10,
+        shape=(6,), dtype=np.int32, minimum=0, name='observation')
+    self._state = SoloFloodState(
+        num_colors,
+        height,
+        width,
         0,
         0,
         0
     )
+
     self._episode_ended = False
+    self.num_colors = num_colors
+    self.width = width
+    self.height = height
 
   def action_spec(self):
     return self._action_spec
@@ -55,16 +71,16 @@ class SolofloodEnv(py_environment.PyEnvironment):
     return self._observation_spec
 
   def _reset(self):
-    self._state = SolofloodState(
-        4,
-        10,
-        10,
+    self._state = SoloFloodState(
+        self.num_colors,
+        self.height,
+        self.width,
         0,
         0,
         0
     )
     self._episode_ended = False
-    return ts.restart(np.array([self._state], dtype=np.int32))
+    return ts.restart(np.array(self._state.state_array, dtype=np.int32)
 
   def _step(self, action):
     '''Step function, can be called with env._step()'''
@@ -77,13 +93,15 @@ class SolofloodEnv(py_environment.PyEnvironment):
 
     # Make sure episodes don't go on forever.
     self._state.current_color = action
-    self._state.owned_blocks += np.random.randint(1, self._state.width * self._state.height - self._state.owned_blocks - 1)
+    self._state.owned_blocks += np.random.randint(1, self._state.width * self._state.height - self._state.owned_blocks + 1)
     self._state.num_turns += 1
-
 
     if self._episode_ended or self._state.owned_blocks >= self._state.height*self._state.width:
       reward = -1*self._state.num_turns
-      return ts.termination(np.array([self._state], dtype=np.int32), reward)
+      return ts.termination(np.array(self._state.state_array, dtype=np.int32), reward)
     else:
       return ts.transition(
-          np.array([self._state], dtype=np.int32), reward=0.0, discount=1
+          np.array(self._state.state_array, dtype=np.int32),
+          reward=0.0, 
+          discount=1
+      )

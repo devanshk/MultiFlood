@@ -21,7 +21,7 @@ def validate_env(env):
     ''' Convenience function to valdate environments '''
     utils.validate_py_environment(env, episodes=5)
 
-def build_tf_env(env)
+def build_tf_env(env):
     '''Uses TF wrapper to build tf environment from python environemnts'''
     tf_env = tf_py_environment.TFPyEnvironment(env)
 

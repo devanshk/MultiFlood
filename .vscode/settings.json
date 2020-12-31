@@ -1,0 +1,3 @@
+{
+    "python.pythonPath": "${workspaceFolder}/multiflood_python/bin/python"
+}
