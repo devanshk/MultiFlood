@@ -80,7 +80,7 @@ class SolofloodEnv(py_environment.PyEnvironment):
         0
     )
     self._episode_ended = False
-    return ts.restart(np.array(self._state.state_array, dtype=np.int32)
+    return ts.restart(np.array(self._state.state_array, dtype=np.int32))
 
   def _step(self, action):
     '''Step function, can be called with env._step()'''
